@@ -1,0 +1,42 @@
+services:
+    rmq:
+        image: rabbitmq:3.7.18-management-alpine
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        healthcheck:
+            test: rabbitmq-diagnostics check_port_connectivity
+            interval: 1s
+            timeout: 3s
+            retries: 30
+    nest-app-publisher:
+        build:
+            context: ../publisher
+            dockerfile: ../docker/Dockerfile.prod
+        ports:
+            - '3000:3000'
+        depends_on:
+            rmq:
+                condition: service_healthy
+        env_file:
+            - ../publisher/.env
+    nest-app-consumer:
+        build:
+            context: ../consumer
+            dockerfile: ../docker/Dockerfile.prod
+        ports:
+            - '3001:3001'
+        depends_on:
+            rmq:
+                condition: service_healthy
+        env_file:
+            - ../consumer/.env
+
+    # this is just an example, you can add your own service
+    # some-service:
+    #   depends_on:
+    #     rmq:
+    #       condition: service_healthy
+    #   build:
+    #     context: ../../ # some path to serviece where docker file lives
+    #   command: npm run start:dev
