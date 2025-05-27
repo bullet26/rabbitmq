@@ -9,6 +9,20 @@ services:
             interval: 1s
             timeout: 3s
             retries: 30
+    mongodb:
+        image: mongo:latest
+        ports:
+            - 27017:27017
+        volumes:
+            - mongo-data:/data/db
+        restart: always
+        env_file:
+            - ../consumer/.env
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/?authSource=${DB_NAME} --quiet
+            interval: 30s
+            timeout: 10s
+            retries: 5
     nest-app-publisher:
         build:
             context: ../publisher
@@ -17,6 +31,8 @@ services:
             - '3000:3000'
         depends_on:
             rmq:
+                condition: service_healthy
+            mongodb:
                 condition: service_healthy
         env_file:
             - ../publisher/.env
@@ -28,6 +44,8 @@ services:
             - '3001:3001'
         depends_on:
             rmq:
+                condition: service_healthy
+            mongodb:
                 condition: service_healthy
         env_file:
             - ../consumer/.env

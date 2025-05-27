@@ -6,9 +6,9 @@ import { CreatePostDto } from './dto/create-post.dto';
 export class PostService {
   constructor(private rabbitMQ: RabbitMQService) {}
   async createPost(postData: CreatePostDto) {
-    const { content, authorId } = postData;
+    const { content, author } = postData;
 
-    if (!content || !authorId) {
+    if (!content || !author) {
       throw new BadRequestException('Content and authorId are required');
     }
 
