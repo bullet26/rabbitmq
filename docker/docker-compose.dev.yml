@@ -10,24 +10,18 @@ services:
             timeout: 3s
             retries: 30
     mongodb:
-        image: mongo:latest
+        image: mongo
         ports:
             - 27017:27017
         volumes:
-            - ./db-entrypoint.sh:/docker-entrypoint-initdb.d/db-entrypoint.sh
-            - ./mongo-data:/data/db
+            - mongo-data:/data/db
         restart: always
-        env_file:
-            - ../consumer/.env
+        env_file: 'mongo.env'
         environment:
-            - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USER}
-            - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASS}
-            - DB_PORT=${DB_PORT}
-            - DB_NAME=${DB_NAME}
-            - DB_USER=${DB_USER}
-            - DB_PASSWORD=${DB_PASSWORD}
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=password
         healthcheck:
-            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/?authSource=${DB_NAME} --quiet
+            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017 --quiet
             interval: 30s
             timeout: 10s
             retries: 5
@@ -37,50 +31,69 @@ services:
             context: ../publisher
             dockerfile: ../docker/Dockerfile.dev
         ports:
-            - '3000:3000'
+            - 3000:3000
+        command: npm run start:dev
         depends_on:
             rmq:
                 condition: service_healthy
-            # mongodb:
-            #     condition: service_healthy
-        volumes:
-            - .:/app
-            - /app/node_modules
-        restart: unless-stopped
+        # volumes:
+        #     - .:/app
+        #     - /app/node_modules
         env_file:
             - ../publisher/.env
-        # develop:
-        #     watch:
-        #         - action: sync
-        #           path: ../src
-        #           target: /app/src
-        #           ignore:
-        #               - node_modules/
-        #         - action: rebuild
-        #           path: ../package.json
+        develop:
+            watch:
+                - action: sync
+                  path: ../src
+                  target: /app/src
+                  ignore:
+                      - node_modules/
+                - action: rebuild
+                  path: ../package.json
     nest-app-consumer:
         build:
             context: ../consumer
             dockerfile: ../docker/Dockerfile.dev
         ports:
-            - '3001:3001'
+            - 3001:3001
+        command: npm run start:dev
         depends_on:
             rmq:
                 condition: service_healthy
-            # mongodb:
-            #     condition: service_healthy
-        volumes:
-            - .:/app
-            - /app/node_modules
-        restart: unless-stopped
+            mongodb:
+                condition: service_healthy
+        # volumes:
+        #     - .:/app
+        #     - /app/node_modules
         env_file:
             - ../consumer/.env
-        # develop:
-        #     watch:
-        #         - action: sync
-        #           path: ../src
-        #           target: /app/src
-        #           ignore:
-        #               - node_modules/
-        #         - action: rebuild
-        #           path: ../package.json
+        develop:
+            watch:
+                - action: sync
+                  path: ../src
+                  target: /app/src
+                  ignore:
+                      - node_modules/
+                - action: rebuild
+                  path: ../package.json
+volumes:
+    mongo-data:
+
+        # this is just an example, you can add your own service
+    # some-service:
+    #   depends_on:
+    #     rmq:
+    #       condition: service_healthy
+    #   build:
+    #     context: ../../ # some path to serviece where docker file lives
+    #   command: npm run start:dev
+
+    # develop:
+    #     watch:
+    #         - action: sync
+    #           path: ../src
+    #           target: /app/src
+    #           ignore:
+    #               - node_modules/
+    #         - action: rebuild
+    #           path: ../package.json

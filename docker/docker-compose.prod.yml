@@ -10,7 +10,7 @@ services:
             timeout: 3s
             retries: 30
     mongodb:
-        image: mongo:latest
+        image: mongo
         ports:
             - 27017:27017
         volumes:
@@ -18,8 +18,11 @@ services:
         restart: always
         env_file:
             - ../consumer/.env
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=password
         healthcheck:
-            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/?authSource=${DB_NAME} --quiet
+            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017 --quiet
             interval: 30s
             timeout: 10s
             retries: 5
@@ -31,8 +34,6 @@ services:
             - '3000:3000'
         depends_on:
             rmq:
-                condition: service_healthy
-            mongodb:
                 condition: service_healthy
         env_file:
             - ../publisher/.env
@@ -49,12 +50,5 @@ services:
                 condition: service_healthy
         env_file:
             - ../consumer/.env
-
-    # this is just an example, you can add your own service
-    # some-service:
-    #   depends_on:
-    #     rmq:
-    #       condition: service_healthy
-    #   build:
-    #     context: ../../ # some path to serviece where docker file lives
-    #   command: npm run start:dev
+volumes:
+    mongo-data:

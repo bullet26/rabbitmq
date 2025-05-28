@@ -9,7 +9,12 @@ export class FindAllDto {
   @Type(() => Date)
   @IsOptional()
   @IsDate()
-  date: string;
+  startDate: string;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  endDate: string;
 
   @Type(() => Number)
   @IsOptional()

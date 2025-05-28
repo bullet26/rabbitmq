@@ -11,12 +11,11 @@ import { MessageModule } from './message/message.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      `${process.env.DATABASE_URI}:${process.env.DB_PORT}`,
+      process.env.DATABASE_URI || 'mongodb://mongodb:27017',
       {
-        dbName: process.env.DB_NAME,
         auth: {
-          username: process.env.DB_USER,
-          password: process.env.DB_PASSWORD,
+          username: process.env.DB_ROOT_USER,
+          password: process.env.DB_ROOT_PASS,
         },
       },
     ),

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -7,6 +7,8 @@ import { FindAllDto } from './dto/find-all.dto';
 
 @Injectable()
 export class MessageService {
+  private readonly logger = new Logger(MessageService.name);
+
   constructor(
     @InjectModel(Message.name) private messageModel: Model<Message>,
   ) {}
@@ -17,11 +19,15 @@ export class MessageService {
   }
 
   async findAll(query: FindAllDto) {
-    const { author, date, limit = 100 } = query;
+    const { author, startDate, endDate, limit = 100 } = query;
+
     const findValues = {
       ...(!!author && { author }),
-      ...(!!date && { date }),
+      ...(!!(startDate && endDate) && {
+        date: { $gte: startDate, $lt: endDate },
+      }),
     };
+
     const messages = await this.messageModel.find(findValues).limit(limit);
     return messages;
   }
