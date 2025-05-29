@@ -16,10 +16,9 @@ services:
         volumes:
             - mongo-data:/data/db
         restart: always
-        env_file: 'mongo.env'
         environment:
-            - MONGO_INITDB_ROOT_USERNAME=root
-            - MONGO_INITDB_ROOT_PASSWORD=password
+            - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USER}
+            - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASS}
         healthcheck:
             test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017 --quiet
             interval: 30s
@@ -36,20 +35,11 @@ services:
         depends_on:
             rmq:
                 condition: service_healthy
-        # volumes:
-        #     - .:/app
-        #     - /app/node_modules
+        volumes:
+            - ../publisher:/app
+            - /app/node_modules
         env_file:
             - ../publisher/.env
-        develop:
-            watch:
-                - action: sync
-                  path: ../src
-                  target: /app/src
-                  ignore:
-                      - node_modules/
-                - action: rebuild
-                  path: ../package.json
     nest-app-consumer:
         build:
             context: ../consumer
@@ -62,20 +52,11 @@ services:
                 condition: service_healthy
             mongodb:
                 condition: service_healthy
-        # volumes:
-        #     - .:/app
-        #     - /app/node_modules
+        volumes:
+            - ../consumer:/app
+            - /app/node_modules
         env_file:
             - ../consumer/.env
-        develop:
-            watch:
-                - action: sync
-                  path: ../src
-                  target: /app/src
-                  ignore:
-                      - node_modules/
-                - action: rebuild
-                  path: ../package.json
 volumes:
     mongo-data:
 

@@ -5,31 +5,30 @@
     дока <a href="https://golevelup.github.io/nestjs/modules/rabbitmq.html" target="_blank">https://golevelup.github.io/nestjs/modules/rabbitmq.html</a>
 -   1 сервис должен посылать сообщения в rabbitmq при вызове эндпоинта (например POST /message)
 -   2 сервис получать эти сообщения из rabbitmq и просто логать
--   обмежити швидкість / кількість повідомлень в консюмері на ітеррацію (set prefetchCount)
+-   обмежити швидкість / кількість повідомлень в консюмері на ітеррацію (I set prefetchCount)
 -   додати валідацію (класс валидатор) на дто
+-   додати монго в докер, https://gist.github.com/maitrungduc1410/f2f7b34d2e736912471b006c6dba17e5
 -   додати монго + монгус в consumer, записувати дані отримані від паблішера в БД
     модель: автор, меседж, дата (автор тут же, не окремий документ)
 -   GET по id и имени автора
-
--   додати монго в докер, https://gist.github.com/maitrungduc1410/f2f7b34d2e736912471b006c6dba17e5
+-   для докера в дев режиме переробити через volume
 
 -   unit tests for publisher
 -   add swagger for publisher & consumer
 
 -   retry x3 -use ack / nack - should use decorator for requeue https://github.com/golevelup/nestjs/issues/660 ????
--   для докера в дев режиме переробити через volume
 
 ## RUN
 
 #### dev
 
-docker-compose -f docker/docker-compose.dev.yml up -d --build
+docker compose -f docker/docker-compose.dev.yml up -d --build
 
 #### prod
 
-docker-compose -f docker/docker-compose.prod.yml up -d --build
+docker compose -f docker/docker-compose.prod.yml up -d --build
 
-docker-compose -f docker/docker-compose.prod.yml logs -f nest-app #logs
+docker compose -f docker/docker-compose.prod.yml logs -f nest-app #logs
 
 ## Questions
 
