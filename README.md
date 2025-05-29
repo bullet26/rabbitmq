@@ -12,9 +12,8 @@
     модель: автор, меседж, дата (автор тут же, не окремий документ)
 -   GET по id и имени автора
 -   для докера в дев режиме переробити через volume
-
--   unit tests for publisher
 -   add swagger for publisher & consumer
+-   unit tests for publisher
 
 -   retry x3 -use ack / nack - should use decorator for requeue https://github.com/golevelup/nestjs/issues/660 ????
 
@@ -24,11 +23,18 @@
 
 docker compose -f docker/docker-compose.dev.yml up -d --build
 
+docker compose -f docker/docker-compose.dev.yml logs -f nest-app-consumer #logs
+
 #### prod
 
 docker compose -f docker/docker-compose.prod.yml up -d --build
 
-docker compose -f docker/docker-compose.prod.yml logs -f nest-app #logs
+docker compose -f docker/docker-compose.prod.yml logs -f nest-app-consumer #logs
+
+## api docs
+
+http://localhost:3000/doc
+http://localhost:3001/doc
 
 ## Questions
 

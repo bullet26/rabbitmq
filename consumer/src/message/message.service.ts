@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -13,9 +13,18 @@ export class MessageService {
     @InjectModel(Message.name) private messageModel: Model<Message>,
   ) {}
 
-  create(createMessageDto: CreateMessageDto) {
-    const createdCat = new this.messageModel(createMessageDto);
-    return createdCat.save();
+  async create(createMessageDto: CreateMessageDto) {
+    const { content, author, date } = createMessageDto;
+    if (!content || !author || !date) {
+      throw new BadRequestException(
+        'Content, author, and date are required fields',
+      );
+    }
+
+    const createdMessage = new this.messageModel(createMessageDto);
+    const savedMessage = await createdMessage.save();
+    this.logger.log(`Message saved in DB: ${savedMessage._id.toString()}`);
+    return savedMessage;
   }
 
   async findAll(query: FindAllDto) {

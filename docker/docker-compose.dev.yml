@@ -20,7 +20,7 @@ services:
             - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USER}
             - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASS}
         healthcheck:
-            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017 --quiet
+            test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${DB_ROOT_USER}:${DB_ROOT_PASS}@localhost:27017 --quiet
             interval: 30s
             timeout: 10s
             retries: 5
@@ -31,7 +31,6 @@ services:
             dockerfile: ../docker/Dockerfile.dev
         ports:
             - 3000:3000
-        command: npm run start:dev
         depends_on:
             rmq:
                 condition: service_healthy
@@ -46,7 +45,6 @@ services:
             dockerfile: ../docker/Dockerfile.dev
         ports:
             - 3001:3001
-        command: npm run start:dev
         depends_on:
             rmq:
                 condition: service_healthy
@@ -68,13 +66,3 @@ volumes:
     #   build:
     #     context: ../../ # some path to serviece where docker file lives
     #   command: npm run start:dev
-
-    # develop:
-    #     watch:
-    #         - action: sync
-    #           path: ../src
-    #           target: /app/src
-    #           ignore:
-    #               - node_modules/
-    #         - action: rebuild
-    #           path: ../package.json

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { ConfigModule } from '@nestjs/config';
 import { PostModule } from './post/post.module';
+import { RootModule } from './root/root.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PostModule } from './post/post.module';
     }),
     RabbitMQModule,
     PostModule,
+    RootModule,
   ],
   controllers: [],
   providers: [],

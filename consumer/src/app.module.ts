@@ -3,6 +3,7 @@ import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MessageModule } from './message/message.module';
+import { RootModule } from './root/root.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MessageModule } from './message/message.module';
     ),
     RabbitMQModule,
     MessageModule,
+    RootModule,
   ],
   controllers: [],
   providers: [],

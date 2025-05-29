@@ -15,6 +15,7 @@ export class PostService {
     const post = {
       id: Date.now().toString(),
       content,
+      author,
     };
 
     await this.rabbitMQ.sendMessage(postData);
